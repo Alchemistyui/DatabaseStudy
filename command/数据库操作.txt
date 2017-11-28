@@ -1,0 +1,140 @@
+
+ // 以下代码是在myOracle的连接下进行的
+create tablespace teach_data
+       datafile'C:\exampleDB\teach_data.dbf'
+       size 100M
+       autoextend on
+       next 20M maxsize unlimited
+       extent management local;
+       
+create temporary tablespace teach_temp
+       tempfile'C:\exampleDB\teach_temp.dbf'
+       size 50M
+       autoextend on
+       next 10M maxsize unlimited
+       extent management local;
+       
+create user teach
+       identified by teach
+       default tablespace teach_data
+       temporary tablespace teach_temp
+       account unlock;
+       
+grant DBA to teach;
+
+
+  //以下在example by user teach连接中进行
+create table student (
+
+   StuID char(13) primary key,
+   StuName varchar(30) not null,
+   StuGender char(2) not null check(StuGender in ('男','女')),
+   Birthday date not null,
+   Major varchar(30) default('软件工程'),
+   StuPhone char(11) null
+   );
+   
+create table course (
+   CourseID char(4),
+   CourseName varchar(20) not null unique,
+   CourseType char(10) not null check(CourseType in ('基础课','选修课','专业课')),
+   CourseCredit smallint null,
+   CoursePeriod smallint null,
+   TestMethod char(4) default'考试',
+   constraint CourseID_PK primary key(CourseID)
+   );
+
+
+
+create table college (
+   CollegeID char(3),
+   CollegeName varchar(40) not null,
+   CollegeIntro char(2) null,
+   CollegeTel char(6) null,
+   constraint CollegeID_PK primary key(CollegeID)
+   );
+   
+create table teacher (
+   TeacherID char(4) primary key,
+   TeacherName char(10) not null,
+   TeacherGender char(2) null,
+   TeacherTitle char(6) null,
+   CollegeID char(3) null references college(CollegeID),
+   TeacherPhone char(11) null
+   );
+   
+create table CPlan (
+   CouresPlanID int primary key,
+   CourseID char(4) not null references course(CourseID),
+   TeacherID char(4) not null references teacher(TeacherID),
+   CourseRoom varchar(30) null,
+   CourseTime varchar(30) null,
+   Note       varchar(50) null
+   );
+   
+ //创建序列
+create sequence user_seq start with 1 increment by 1 nomaxvalue nocycle;
+
+
+alter table cplan 
+   rename column CouresPlanID to CoursePlanID;
+
+create table REGISTER (
+   CourseRegID int not null,
+   CoursePlanID int not null,
+   StudentID char(10) not null,
+   Note      varchar(30) null,
+   constraint CourseRegID_PK primary key (CourseRegID),
+   constraint CoursePlanID_FK foreign key (CoursePlanID) references CPLAN(CoursePlanID),
+   constraint StuID_FK foreign key (StudentID) references student(StuID)
+   );
+   
+create sequence REGISTER_seq start with 1 increment by 1 nomaxvalue nocycle;
+
+
+ALTER TABLE REGISTER
+ADD RegTime VarChar(30) NULL;
+
+INSERT INTO STUDENT VALUES('2015220100002','小非非','男', to_date('1997-09-07','yyyy-mm-dd'),'自动化','17792329261');
+
+INSERT INTO STUDENT VALUES('2016220203031','大彪','女', to_date('1999-03-11','yyyy-mm-dd'),'软件技术','18280007528');
+
+SELECT * from STUDENT;
+
+UPDATE STUDENT
+SET StuName='a ho'
+WHERE StuName='小非非';
+
+SELECT * from STUDENT;
+
+INSERT INTO STUDENT VALUES('23333','test','男',to_date('1999-02-11','yyyy-mm-dd'),'emmm','110');
+DELETE FROM STUDENT WHERE StuName='test';
+
+SELECT stuName,Birthday FROM STUDENT;
+
+SELECT * FROM STUDENT
+WHERE StuGender='男';
+
+SELECT StuID,StuName,StuGender,Major
+FROM STUDENT
+WHERE StuGender='男';
+
+SELECT * FROM STUDENT
+WHERE to_char(birthday,'yyyy-mm-dd') between '1999-01-01' AND '2000-01-01';
+
+select * from student
+where stuPhone like '182%';
+
+INSERT INTO STUDENT VALUES('23333','test','男',to_date('1990-02-11','yyyy-mm-dd'),'emmm','110');
+
+select * from student
+order by birthday desc,stuID asc;
+
+select distinct stuGender from student;
+
+select count(*) as renshu
+from student;
+
+select min(birthday) as zuida from student;
+select max(birthday) as zuixiao from student;
+select stuname, length(trim(stuphone)) as 电话号长度 from student;

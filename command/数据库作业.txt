@@ -1,0 +1,210 @@
+09-27作业
+
+2.create tablespace my2016220203031_Job
+   datafile 'C:\exampleDB\2016220203031_Job_data.dbf'
+   size 100M
+   autoextend on
+   next 20M maxsize unlimited
+   extent management local;
+
+create temporary tablespace my2016220203031_Job_temp
+   tempfile 'C:\exampleDB\2016220203031_Job_temp.dbf'
+   size 50M
+   autoextend on
+   next 10M maxsize unlimited
+   extent management local; 
+
+
+
+
+3.create user user_2016220203031
+   identified by 2016220203031
+   default tablespace my2016220203031_Job
+   temporary tablespace my2016220203031_Job_temp
+   account unlock;
+
+grant DBA to user_2016220203031;
+
+
+4.
+
+
+
+5.(1).
+create tablespace HR
+   datafile 'C:\exampleDB\HR.dbf'
+   size 100M
+   autoextend on
+   next 20M maxsize unlimited
+   extent management local;
+  
+create table Department(
+   DeptID char(3) not null,
+   DeptName char(30) not null,
+   DeptTel char(20) null,
+   DeptManager char(10) null,
+   constraint DeptID_PK primary key(DeptID)
+   )tablespace HR;
+   
+create table Employee(
+   EmpID char(5) not null,
+   EmpName char(10) not null,
+   Gender char(2) null,
+   Title char(6) null,
+   DeptID char(3) not null,
+   Phone char(11) not null,
+   constraint EmpID_PK primary key(EmpID)
+   );
+
+(2).
+insert into Department 
+   values ('001','研发部','18280007528','大彪');
+
+insert into Employee
+   values ('001','大彪','女','员工','001','18280007528');
+
+update Department
+   set DeptTel='110'
+   where DeptID='001';
+   
+select * from Department;
+   
+insert into Employee
+   values ('002','小彪','女','员工','001','18280007529');
+delete from Employee where EmpName='小彪';
+
+(3).
+
+
+(4).
+
+
+
+6.(1).
+create tablespace EstateDB
+   datafile 'C:\exampleDB\EstateDB.dbf'
+   size 100M
+   autoextend on
+   next 20M maxsize unlimited
+   extent management local;
+
+(2).
+CREATE TABLE OWNER(
+   PersonID Char(18) NOT NULL PRIMARY KEY,
+   Name Varchar(20) NOT NULL,
+   Gender Char(2) NOT NULL,
+   Occupation Varchar(20) NOT NULL,
+   Addr Varchar(50) NOT NULL,
+   Tel Varchar(11) NOT NULL
+   )TABLESPACE EstateDB;
+   
+CREATE TABLE ESTATE (
+   EstateID Char(15) NOT NULL PRIMARY KEY,
+   EstateName VarChar(50) NOT NULL,
+   EstateBuildName Varchar(50) NOT NULL,
+   EstateAddr Varchar(60) NOT NULL,
+   EstateCity Varchar(60) NOT NULL,
+   EstateType Char(4) NOT NULL CHECK(EstateType IN('住宅','商铺','车位','别墅')),
+   PropertyArea Numeric(5,2) NOT NULL,
+   UsableArea Numeric(5,2) NOT NULL,
+   CompletedDate Date NOT NULL,
+   YearLength Int  DEFAULT '70' NOT NULL,
+   Remark Varchar(100) NULL
+   )TABLESPACE EstateDB;
+
+
+ CREATE TABLE Registration(
+    RegisterID Int NOT NULL PRIMARY KEY,
+    PersonID Char(18) NOT NULL REFERENCES Owner(PersonID),
+    EstateID Char(15) NOT NULL REFERENCES Estate(EstateID),
+    Price Int NOT NULL,
+    PurchasedDate Date NOT NULL,
+    DeliverDate Date NOT NULL
+    )TABLESPACE EstateDB;
+
+
+(3).
+INSERT INTO Estate
+VALUES('001','商铺1','楼盘1','成华区','成都','商铺','50','40',to_date('2015-01-01','yyyy-mm-dd'),10,'无');
+INSERT INTO Estate
+VALUES('002','住宅1','楼盘1','成华区','成都','住宅','100','80',to_date('2015-01-01','yyyy-mm-dd'),10,'无');
+INSERT INTO Estate
+VALUES('003','住宅2','楼盘2','成华区','成都','住宅','90','70',to_date('2015-01-01','yyyy-mm-dd'),10,'无');
+
+INSERT INTO Owner
+VALUES('0001','土豪','男','老师','成都','13112341234');
+INSERT INTO Owner
+VALUES('0002','穷人','男','老师','成都','13143214321');
+
+INSERT INTO Registration 
+VALUES('1','0001','002',50000,to_date('2015-01-01','yyyy-mm-dd'),to_date('2015-02-01','yyyy-mm-dd'));
+INSERT INTO Registration 
+VALUES('2','0001','003',100000,to_date('2015-01-01','yyyy-mm-dd'),to_date('2015-02-01','yyyy-mm-dd'));
+INSERT INTO Registration 
+VALUES('3','0002','001',5000,to_date('2015-01-01','yyyy-mm-dd'),to_date('2015-02-01','yyyy-mm-dd'));
+
+(4).
+SELECT * FROM Estate
+WHERE EstateType='商铺';
+
+(5).
+SELECT * FROM Estate
+WHERE CompletedDate>=to_date('2015-01-01','yyyy-mm-dd') AND PropertyArea>= 90 AND EstateType='住宅';
+
+(6).
+SELECT * FROM Owner
+WHERE PersonID IN (SELECT R.PersonID
+                   FROM ESTATE E, Registration R
+                   WHERE E.EstateID=R.EstateID AND E.EstateType='住宅'
+                   GROUP BY R.PersonID
+                   HAVING COUNT(*) >=2
+                   );
+
+(7).
+SELECT * FROM Owner
+WHERE PersonID IN (SELECT R.PersonID
+                   FROM ESTATE E, Registration R
+                   WHERE E.EstateID=R.EstateID AND E.EstateType='住宅' AND E.EstateCity='成都'
+                   GROUP BY R.PersonID
+                   HAVING COUNT(*) >=2
+                   );
+
+
+(8).
+SELECT E.EstateType, SUM(E.PropertyArea) FROM Registration R, Estate E
+WHERE E.EstateID=R.EstateID AND R.PurchasedDate>=to_date('2015-01-01','yyyy-mm-dd')
+GROUP BY E.EstateType;
+
+(9).
+SELECT E.EstateType, SUM(R.Price) FROM Registration R, Estate E
+WHERE E.EstateID=R.EstateID AND R.PurchasedDate>=to_date('2015-01-01','yyyy-mm-dd')
+GROUP BY E.EstateType;
+
+(10).
+CREATE VIEW Owner_001 AS
+SELECT  R.RegisterID AS 登记编号,
+        E.EstateName AS 房产名称,
+        E.EstateType AS 房产类型,
+        E.PropertyArea AS 产权面积,
+        R.Price AS 购买金额,
+        R.PurchasedDate AS 购买日期,
+        E.EstateBuildName AS 房产楼盘,
+        E.EstateCity AS 房产城市
+FROM Estate E,Registration R
+WHERE R.PersonID='0001' AND R.EstateID=E.EstateID
+ORDER BY R.PurchasedDate DESC;
+
+SELECT * FROM Owner_001;
+
+SELECT E.EstateType, SUM(R.Price) FROM Registration R, Estate E
+WHERE E.EstateID=R.EstateID AND R.PurchasedDate>=to_date('2015-01-01','yyyy-mm-dd')
+GROUP BY E.EstateType;
+
+(11).
+CREATE VIEW CitySale AS 
+SELECT COUNT(R.RegisterID) AS 销售套数, 
+       SUM(R.Price) AS 总销售金额
+FROM Registration R, Estate E
+GROUP BY E.EstateCity;
+
+SELECT * FROM CitySale;
