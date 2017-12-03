@@ -1,0 +1,85 @@
+
+6.
+（1）
+CREATE TABLESPACE BORROW
+       DATAFILE 'C:\exampleDB\borrow.dbf'
+       SIZE 100M
+       AUTOEXTEND on
+       NEXT 20M MAXSIZE unlimited
+       EXTENT MANAGEMENT local;
+       
+CREATE TEMPORARY TABLESPACE BORROW_TEMP
+       TEMPFILE'C:\exampleDB\borrow_temp.dbf'
+       size 50M
+        AUTOEXTEND on
+       NEXT 10M MAXSIZE unlimited
+       EXTENT MANAGEMENT local;
+       
+
+（2）
+CREATE TABLE DEPARTMENT (
+    DeptID char(3) NOT NULL PRIMARY KEY,
+    DeptName char(30) NULL,
+    DeptTel char(20) NULL,
+    DeptManager char(10) NULL
+    );
+    
+CREATE TABLE READER (
+    ReaderID char(5) NOT NULL PRIMARY KEY,
+    ReaderName char(30） NULL,
+    Gender char(2) NULL,
+    Birthday date NULL,
+    DeptID char(3) NULL,
+    Phone char(11) NULL,
+    CONSTRAINT DeptID_PK FOREIGN KEY(DeptID)
+              REFERENCES DEPARTMENT(DeptID)
+    );
+    
+CREATE TABLE BOOK (
+    ISBN char(16) NOT NULL PRIMARY KEY,
+    BookName char(30) NOT NULL,
+    BookIntr char(255) NULL,
+    BookType char(30) NULL,
+    Authors char(30) NULL,
+    Price int NULL,
+    Publisher char(30)  NULL,
+    PublishDate date NULL
+    );
+    
+
+    
+CREATE TABLE LOAN (
+    RecordID int NOT NULL,
+    ReaderID char(5) NOT NULL REFERENCES READER(ReaderID),
+    ISBN CHAR(16) NOT NULL REFERENCES BOOK(ISBN),
+    OperType char(4) Not NULL,
+    OperDate date NULL,
+    Note char(100) NULL
+    );
+    
+    CREATE SEQUENCE Seq_Loan_ReacordID INCREMENT BY 1 START WITH 1;
+
+
+
+（3）
+ALTER TABLE LOAN
+    ADD CONSTRAINTS ReaderID_FK FOREIGN KEY(ReaderID)
+                    REFERENCES READER(ReaderID)
+                    ON DELETE CASECADE;
+
+ALTER TABLE LOAN
+    ADD CONSTRAINTS ISBN FOREIGN KEY(ISBN)
+                    REFERENCES BOOK(ISBN)
+                    ON DELETE CASECADE;
+
+(4)
+INSERT INTO READER (ReaderID,ReaderName, Gender)
+    VALUES ('00001','大彪','女'）;
+    
+SELECT * FROM READER;
+
+INSERT INTO BOOK (ISBN,BookName)
+    VALUES ('001','小王子');
+    
+SELECT * FROM BOOK;
+
