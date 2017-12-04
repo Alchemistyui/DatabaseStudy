@@ -1,0 +1,277 @@
+zuoye 4
+1.
+alter table "House"
+   drop constraint FK_HOUSE_CLIENTREN_CLIENT;
+
+alter table "RentFee"
+   drop constraint FK_RENTFEE_CLIENTREN_CLIENT;
+
+alter table "RentFee"
+   drop constraint FK_RENTFEE_HOUSERENT_HOUSE;
+
+alter table "RentPrice"
+   drop constraint FK_RENTPRIC_HOUSERENT_HOUSE;
+
+alter table "RentReg"
+   drop constraint FK_RENTREG_CLIENTREN_CLIENT;
+
+alter table "RentReg"
+   drop constraint FK_RENTREG_HOUSERENT_HOUSE;
+
+drop index "ClientRentHouse_FK";
+
+drop table "House" cascade constraints;
+
+drop index "HouseRentFee_FK";
+
+drop index "ClientRentFee_FK";
+
+drop table "RentFee" cascade constraints;
+
+drop table "RentPrice" cascade constraints;
+
+drop index "ClientRentMsg_FK";
+
+drop table "RentReg" cascade constraints;
+
+drop table "client" cascade constraints;
+
+/*==============================================================*/
+/* Table: "House"                                               */
+/*==============================================================*/
+create table "House" 
+(
+   "HouseID"            CHAR(16)             not null,
+   "ClientID"           CHAR(10),
+   "HouseArea"          INTEGER              not null,
+   "HouseState"         CHAR(30),
+   constraint PK_HOUSE primary key ("HouseID")
+);
+
+/*==============================================================*/
+/* Index: "ClientRentHouse_FK"                                  */
+/*==============================================================*/
+create index "ClientRentHouse_FK" on "House" (
+   "ClientID" ASC
+);
+
+/*==============================================================*/
+/* Table: "RentFee"                                             */
+/*==============================================================*/
+create table "RentFee" 
+(
+   "ClientID"           CHAR(10)             not null,
+   "HouseID"            CHAR(16)             not null,
+   "PayTime"            DATE                 not null,
+   "Fee"                INTEGER              not null,
+   constraint PK_RENTFEE primary key ("ClientID", "HouseID")
+);
+
+/*==============================================================*/
+/* Index: "ClientRentFee_FK"                                    */
+/*==============================================================*/
+create index "ClientRentFee_FK" on "RentFee" (
+   "ClientID" ASC
+);
+
+/*==============================================================*/
+/* Index: "HouseRentFee_FK"                                     */
+/*==============================================================*/
+create index "HouseRentFee_FK" on "RentFee" (
+   "HouseID" ASC
+);
+
+/*==============================================================*/
+/* Table: "RentPrice"                                           */
+/*==============================================================*/
+create table "RentPrice" 
+(
+   "HouseID"            CHAR(16)             not null,
+   "MonthPrice"         INTEGER              not null,
+   constraint PK_RENTPRICE primary key ("HouseID")
+);
+
+/*==============================================================*/
+/* Table: "RentReg"                                             */
+/*==============================================================*/
+create table "RentReg" 
+(
+   "ClientID"           CHAR(10)             not null,
+   "HouseID"            CHAR(16)             not null,
+   "BeginTime"          DATE                 not null,
+   "EndTime"            DATE                 not null,
+   constraint PK_RENTREG primary key ("ClientID", "HouseID")
+);
+
+/*==============================================================*/
+/* Index: "ClientRentMsg_FK"                                    */
+/*==============================================================*/
+create index "ClientRentMsg_FK" on "RentReg" (
+   "ClientID" ASC
+);
+
+/*==============================================================*/
+/* Table: "client"                                              */
+/*==============================================================*/
+create table "client" 
+(
+   "ClientID"           CHAR(10)             not null,
+   "ClientName"         CHAR(16)             not null,
+   "ClientJob"          CHAR(20)             not null,
+   constraint PK_CLIENT primary key ("ClientID")
+);
+
+alter table "House"
+   add constraint FK_HOUSE_CLIENTREN_CLIENT foreign key ("ClientID")
+      references "client" ("ClientID");
+
+alter table "RentFee"
+   add constraint FK_RENTFEE_CLIENTREN_CLIENT foreign key ("ClientID")
+      references "client" ("ClientID");
+
+alter table "RentFee"
+   add constraint FK_RENTFEE_HOUSERENT_HOUSE foreign key ("HouseID")
+      references "House" ("HouseID");
+
+alter table "RentPrice"
+   add constraint FK_RENTPRIC_HOUSERENT_HOUSE foreign key ("HouseID")
+      references "House" ("HouseID");
+
+alter table "RentReg"
+   add constraint FK_RENTREG_CLIENTREN_CLIENT foreign key ("ClientID")
+      references "client" ("ClientID");
+
+alter table "RentReg"
+   add constraint FK_RENTREG_HOUSERENT_HOUSE foreign key ("HouseID")
+      references "House" ("HouseID");
+
+
+2.
+alter table "Course"
+   drop constraint FK_COURSE_STUDENTCH_STUDENT;
+
+alter table "Grade"
+   drop constraint FK_GRADE_COURSEGRA_COURSE;
+
+alter table "Grade"
+   drop constraint FK_GRADE_STUDENTGR_STUDENT;
+
+alter table "Student"
+   drop constraint FK_STUDENT_STUDENTIN_ACADEMY;
+
+alter table "Teacher"
+   drop constraint FK_TEACHER_TEACHERTE_COURSE;
+
+drop table "Academy" cascade constraints;
+
+drop table "Course" cascade constraints;
+
+drop index 课程考试成绩_FK;
+
+drop index 学生考试成绩_FK;
+
+drop table "Grade" cascade constraints;
+
+drop index 学生属于学院_FK;
+
+drop table "Student" cascade constraints;
+
+drop table "Teacher" cascade constraints;
+
+/*==============================================================*/
+/* Table: "Academy"                                             */
+/*==============================================================*/
+create table "Academy" 
+(
+   "AcademyID"          CHAR(16)             not null,
+   "AcademyName"        CHAR(20)             not null,
+   constraint PK_ACADEMY primary key ("AcademyID")
+);
+
+/*==============================================================*/
+/* Table: "Course"                                              */
+/*==============================================================*/
+create table "Course" 
+(
+   "CourseID"           CHAR(16)             not null,
+   "StudentID"          CHAR(16)             not null,
+   "CourseName"         CHAR(20)             not null,
+   constraint PK_COURSE primary key ("CourseID")
+);
+
+/*==============================================================*/
+/* Table: "Grade"                                               */
+/*==============================================================*/
+create table "Grade" 
+(
+   "StudentID"          CHAR(16)             not null,
+   "CourseID"           CHAR(16)             not null,
+   "Grade"              INTEGER              not null,
+   constraint PK_GRADE primary key ("StudentID", "CourseID")
+);
+
+/*==============================================================*/
+/* Index: 学生考试成绩_FK                                             */
+/*==============================================================*/
+create index 学生考试成绩_FK on "Grade" (
+   "StudentID" ASC
+);
+
+/*==============================================================*/
+/* Index: 课程考试成绩_FK                                             */
+/*==============================================================*/
+create index 课程考试成绩_FK on "Grade" (
+   "CourseID" ASC
+);
+
+/*==============================================================*/
+/* Table: "Student"                                             */
+/*==============================================================*/
+create table "Student" 
+(
+   "StudentID"          CHAR(16)             not null,
+   "AcademyID"          CHAR(16)             not null,
+   "StudentName"        CHAR(20)             not null,
+   "StudentClass"       CHAR(10)             not null,
+   constraint PK_STUDENT primary key ("StudentID")
+);
+
+/*==============================================================*/
+/* Index: 学生属于学院_FK                                             */
+/*==============================================================*/
+create index 学生属于学院_FK on "Student" (
+   "AcademyID" ASC
+);
+
+/*==============================================================*/
+/* Table: "Teacher"                                             */
+/*==============================================================*/
+create table "Teacher" 
+(
+   "TeacherID"          CHAR(16)             not null,
+   "CourseID"           CHAR(16),
+   "TeacherName"        CHAR(20)             not null,
+   constraint PK_TEACHER primary key ("TeacherID")
+);
+
+alter table "Course"
+   add constraint FK_COURSE_STUDENTCH_STUDENT foreign key ()
+      references "Student" ("StudentID");
+
+alter table "Grade"
+   add constraint FK_GRADE_COURSEGRA_COURSE foreign key ("CourseID")
+      references "Course" ("CourseID");
+
+alter table "Grade"
+   add constraint FK_GRADE_STUDENTGR_STUDENT foreign key ("StudentID")
+      references "Student" ("StudentID");
+
+alter table "Student"
+   add constraint FK_STUDENT_STUDENTIN_ACADEMY foreign key ("AcademyID")
+      references "Academy" ("AcademyID");
+
+alter table "Teacher"
+   add constraint FK_TEACHER_TEACHERTE_COURSE foreign key ()
+      references "Course" ("CourseID");
+
+
