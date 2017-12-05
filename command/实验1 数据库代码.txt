@@ -1,0 +1,22 @@
+CREATE TABLESPACE RENTBOOK
+       DATAFILE 'C:\exampleDB\rentbook.dbf'
+       SIZE 100M
+       AUTOEXTEND on
+       NEXT 20M MAXSIZE unlimited
+       EXTENT MANAGEMENT local;
+       
+CREATE TEMPORARY TABLESPACE RENTBOOK_TEMP
+       TEMPFILE'C:\exampleDB\rentbook_temp.dbf'
+       size 50M
+        AUTOEXTEND on
+       NEXT 10M MAXSIZE unlimited
+       EXTENT MANAGEMENT local;
+
+
+CREATE USER EXPERIMENT_2016220203031
+       identified by EXPERIMENT_2016220203031
+       default tablespace RENTBOOK
+       temporary tablespace RENTBOOK_TEMP
+       account unlock;
+       
+GRANT DBA TO EXPERIMENT_2016220203031;

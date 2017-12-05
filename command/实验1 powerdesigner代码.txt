@@ -1,0 +1,154 @@
+alter table "Book"
+   drop constraint FK_BOOK_BOOKCONTE_BOOKCONT;
+
+alter table "RentReturnRecord"
+   drop constraint FK_RENTRETU_BOOKRENTR_BOOK;
+
+alter table "RentReturnRecord"
+   drop constraint FK_RENTRETU_RENTERREN_RENTER;
+
+alter table "RenterReserveBook"
+   drop constraint FK_RENTERRE_RENTERRES_BOOK;
+
+alter table "RenterReserveBook"
+   drop constraint FK_RENTERRE_RENTERRES_RENTER;
+
+drop index "BookContentHaveBook_FK";
+
+drop table "Book" cascade constraints;
+
+drop table "BookContent" cascade constraints;
+
+drop index "BookRentReturnRecord_FK";
+
+drop index "RenterRentReturnRecord_FK";
+
+drop table "RentReturnRecord" cascade constraints;
+
+drop table "Renter" cascade constraints;
+
+drop index "RenterReserveBook_FK";
+
+drop index "RenterReserveBook2_FK";
+
+drop table "RenterReserveBook" cascade constraints;
+
+/*==============================================================*/
+/* Table: "Book"                                                */
+/*==============================================================*/
+create table "Book" 
+(
+   "BookID"             CHAR(16)             not null,
+   "ContentID"          CHAR(16)             not null,
+   "BookName"           CHAR(30)             not null,
+   ISBN                 CHAR(10)             not null,
+   "Author"             CHAR(20)             not null,
+   "PublishingHouse"    CHAR(30)             not null,
+   "PublishingDate"     DATE                 not null,
+   "BookPrice"          INTEGER              not null,
+   "IsInStoreHouse"     SMALLINT             not null,
+   constraint PK_BOOK primary key ("BookID")
+);
+
+/*==============================================================*/
+/* Index: "BookContentHaveBook_FK"                              */
+/*==============================================================*/
+create index "BookContentHaveBook_FK" on "Book" (
+   "ContentID" ASC
+);
+
+/*==============================================================*/
+/* Table: "BookContent"                                         */
+/*==============================================================*/
+create table "BookContent" 
+(
+   "ContentID"          CHAR(16)             not null,
+   "ContentName"        CHAR(30)             not null,
+   "ContentCategory"    CHAR(20)             not null,
+   constraint PK_BOOKCONTENT primary key ("ContentID")
+);
+
+/*==============================================================*/
+/* Table: "RentReturnRecord"                                    */
+/*==============================================================*/
+create table "RentReturnRecord" 
+(
+   "RentReturnID"       CHAR(16)             not null,
+   "RenterID"           CHAR(16)             not null,
+   "BookID"             CHAR(16)             not null,
+   "RentReturnCategory" CHAR(10)             not null,
+   "RentReturnTime"     DATE                 not null,
+   constraint PK_RENTRETURNRECORD primary key ("RentReturnID")
+);
+
+/*==============================================================*/
+/* Index: "RenterRentReturnRecord_FK"                           */
+/*==============================================================*/
+create index "RenterRentReturnRecord_FK" on "RentReturnRecord" (
+   "RenterID" ASC
+);
+
+/*==============================================================*/
+/* Index: "BookRentReturnRecord_FK"                             */
+/*==============================================================*/
+create index "BookRentReturnRecord_FK" on "RentReturnRecord" (
+   "BookID" ASC
+);
+
+/*==============================================================*/
+/* Table: "Renter"                                              */
+/*==============================================================*/
+create table "Renter" 
+(
+   "RenterID"           CHAR(16)             not null,
+   "RenterName"         CHAR(20)             not null,
+   "RenterAddress"      CHAR(50)             not null,
+   "RenterPhone"        CHAR(15)             not null,
+   constraint PK_RENTER primary key ("RenterID")
+);
+
+/*==============================================================*/
+/* Table: "RenterReserveBook"                                   */
+/*==============================================================*/
+create table "RenterReserveBook" 
+(
+   "BookID"             CHAR(16)             not null,
+   "RenterID"           CHAR(16)             not null,
+   预定时间                 DATE                 not null,
+   预定号                  CHAR(16)             not null,
+   constraint PK_RENTERRESERVEBOOK primary key (预定号)
+);
+
+/*==============================================================*/
+/* Index: "RenterReserveBook2_FK"                               */
+/*==============================================================*/
+create index "RenterReserveBook2_FK" on "RenterReserveBook" (
+   "RenterID" ASC
+);
+
+/*==============================================================*/
+/* Index: "RenterReserveBook_FK"                                */
+/*==============================================================*/
+create index "RenterReserveBook_FK" on "RenterReserveBook" (
+   "BookID" ASC
+);
+
+alter table "Book"
+   add constraint FK_BOOK_BOOKCONTE_BOOKCONT foreign key ("ContentID")
+      references "BookContent" ("ContentID");
+
+alter table "RentReturnRecord"
+   add constraint FK_RENTRETU_BOOKRENTR_BOOK foreign key ("BookID")
+      references "Book" ("BookID");
+
+alter table "RentReturnRecord"
+   add constraint FK_RENTRETU_RENTERREN_RENTER foreign key ("RenterID")
+      references "Renter" ("RenterID");
+
+alter table "RenterReserveBook"
+   add constraint FK_RENTERRE_RENTERRES_BOOK foreign key ("BookID")
+      references "Book" ("BookID");
+
+alter table "RenterReserveBook"
+   add constraint FK_RENTERRE_RENTERRES_RENTER foreign key ("RenterID")
+      references "Renter" ("RenterID");
