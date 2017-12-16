@@ -1,0 +1,61 @@
+
+CREATE USER EXPERIMENT_2016220203031
+       identified by EXPERIMENT_2016220203031
+       default tablespace RENTBOOK
+       temporary tablespace RENTBOOK_TEMP
+       account unlock;
+       
+GRANT DBA TO EXPERIMENT_2016220203031;
+
+
+CREATE USER test_user
+    identified by test
+       default tablespace RENTBOOK
+       temporary tablespace RENTBOOK_TEMP
+       account unlock;
+       
+GRANT CREATE TABLE,CREATE USER TO test_user
+    WITH ADMIN OPTION;
+
+SELECT * FROM dba_role_privs;
+
+SELECT * FROM session_privs;
+
+REVOKE CREATE USER FROM test_user;
+
+//DROP USER test_user CASCADE;
+
+GRANT SELECT,UPDATE,INSERT ON BOOK TO test_user;
+
+
+
+
+
+
+CREATE TABLE DEPARTMENT (
+    DeptID char(3) NOT NULL PRIMARY KEY,
+    DeptName char(30) NULL,
+    DeptTel char(20) NULL,
+    DeptManager char(10) NULL
+    );
+    
+CREATE USER test_user2
+    identified by test
+       default tablespace RENTBOOK
+       temporary tablespace RENTBOOK_TEMP
+       account unlock;
+
+
+
+
+
+
+CREATE ROLE common_user2
+    NOT IDENTIFIED;
+    
+GRANT CONNECT TO common_user;
+GRANT RESOURCE TO common_user;
+GRANT common_user TO test_user;
+SET ROLE common_user;
+
+DROP ROLE common_user;
